@@ -37,7 +37,7 @@ class spawn(SpawnBase):
                  searchwindowsize=None, logfile=None, cwd=None, env=None,
                  ignore_sighup=False, echo=True, preexec_fn=None,
                  encoding=None, codec_errors='strict', dimensions=None,
-                 use_poll=False):
+                 use_poll=False, encode_cmdline=False):
         '''This is the constructor. The command parameter may be a string that
         includes a command and any arguments to the command. For example::
 
@@ -188,6 +188,7 @@ class spawn(SpawnBase):
         '''
         super(spawn, self).__init__(timeout=timeout, maxread=maxread, searchwindowsize=searchwindowsize,
                                     logfile=logfile, encoding=encoding, codec_errors=codec_errors)
+        self.encode_cmdline = encode_cmdline
         self.STDIN_FILENO = pty.STDIN_FILENO
         self.STDOUT_FILENO = pty.STDOUT_FILENO
         self.STDERR_FILENO = pty.STDERR_FILENO
@@ -294,7 +295,7 @@ class spawn(SpawnBase):
         if dimensions is not None:
             kwargs['dimensions'] = dimensions
 
-        if self.encoding is not None:
+        if self.encoding is not None and self.encode_cmdline:
             # Encode command line using the specified encoding
             self.args = [a if isinstance(a, bytes) else a.encode(self.encoding)
                          for a in self.args]
